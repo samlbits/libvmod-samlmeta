@@ -1,12 +1,13 @@
 #!/usr/bin/make -f
 export DH_VERBOSE=1
 
-VARNISHSRC = varnish-3.0.2
+VERSION = $(shell apt-cache show varnish | grep Version: | awk '{print $2}' | awk -F- '{print $1}')
+VARNISHSRC = varnish-${VERSION}
 VMODDIR = $(shell PKG_CONFIG_PATH="$(VARNISHSRC)" pkg-config --variable=vmoddir varnishapi)
 
 override_dh_auto_configure:
 	./autogen.sh
-	apt-source varnish
+	apt-get source varnish
 	dh_auto_configure -- VMODDIR="$(VMODDIR)" VARNISHSRC="$(VARNISHSRC)"
 
 override_dh_gencontrol:
