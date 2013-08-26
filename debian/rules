@@ -19,7 +19,7 @@ override_dh_gencontrol:
 	fi
 
 clean:
-	rm -rf varnish-* varnish_* Makefile.in aclocal.m4 config.log config.guess config.h.in config.sub configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
+	rm -rf config.h libtool varnish-* varnish_* Makefile.in aclocal.m4 config.log config.guess config.h.in config.sub config.status configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
 	dh_clean
 
 
