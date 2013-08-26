@@ -65,3 +65,4 @@ stamp-h1
 vmod_header.3
 varnish-*
 varnish_*
+debian/libvmod-samlmeta.debhelper.log
