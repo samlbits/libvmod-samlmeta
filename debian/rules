@@ -67,7 +67,7 @@ clean:
 
 
 	dh_clean
-	rm -rf varnish_* varnish-*
+	rm -rf varnish_* varnish-* Makefile.in aclocal.m4 config.h.in configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
 
 install: build
 	dh_testdir
