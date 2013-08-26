@@ -5,11 +5,18 @@ VERSION = `apt-cache show varnish | grep Version: | awk '{print $$2}' | awk -F- 
 VARNISHSRC = varnish-${VERSION}
 VMODDIR = $(shell PKG_CONFIG_PATH="$(VARNISHSRC)" pkg-config --variable=vmoddir varnishapi)
 
+exec_prefix=$(shell pkg-config --variable=exec_prefix varnishapi)
+prefix=$(shell pkg-config --variable=prefix varnishapi)
+libdir=$(shell pkg-config --variable=libdir varnishapi)
+includedir=$(shell pkg-config --variable=includedir varnishapi)
+vmoddir=$(shell pkg-config --variable=vmoddir varnishapi)
+
+
 override_dh_auto_configure:
 	./autogen.sh
 	apt-get source varnish
-	(cd ${VARNISHSRC} && ./configure --exec_prefix="`pkg-config --variable=exec_prefix varnishapi`" --prefix="`pkg-config  --variable=prefix varnishapi`" --libdir="`pkg-config  --variable=libdir varnishapi`" --includedir="`pkg-config  --variable=includedir varnishapi`" --vmoddir="`pkg-config  --variable=vmoddir varnishapi`" && make)
-	dh_auto_configure -- VMODDIR="$(VMODDIR)" VARNISHSRC="$(VARNISHSRC)"
+	(cd ${VARNISHSRC} && ./configure --exec-prefix=${exec_prefix} --localstatedir=/var --sysconfdir=/etc/varnish --prefix=${prefix} --libdir=${libdir} --includedir=${includedir} VMDODDIR=${vmoddir} && make
+	 dh_auto_configure -- VMODDIR="$(VMODDIR)" VARNISHSRC="$(VARNISHSRC)"
 
 override_dh_gencontrol:
 	if [ -n "$$DEBIAN_OVERRIDE_BINARY_VERSION" ]; then \
