@@ -9,7 +9,7 @@ varnish v1 -vcl+backend {
 	import samlmeta from "${vmod_topbuild}/src/.libs/libvmod_samlmeta.so";
 
 	sub vcl_deliver {
-		set resp.http.hello = samlmeta.samlmeta_ttl()
+		set resp.http.hello = samlmeta.samlmeta_ttl();
 	}
 } -start
 
