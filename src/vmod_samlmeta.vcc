@@ -1,0 +1,3 @@
+Module samlmeta
+Init init_function
+Function STRING vmod_samlmeta_ttl()

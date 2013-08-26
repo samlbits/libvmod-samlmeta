@@ -1,0 +1,5 @@
+libvmmod-samlmeta (0.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Leif Johansson <leifj@unknown>  Mon, 26 Aug 2013 08:24:50 +0200
