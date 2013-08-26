@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 export DH_VERBOSE=1
 
-VARNISHSRC = $(DEBIAN_VARNISH_SRC)
+VARNISHSRC = varnish-3.0.2
 VMODDIR = $(shell PKG_CONFIG_PATH="$(VARNISHSRC)" pkg-config --variable=vmoddir varnishapi)
 
 override_dh_auto_configure:
@@ -16,7 +16,7 @@ override_dh_gencontrol:
 	fi
 
 clean:
-	rm -rf Makefile.in aclocal.m4 config.guess config.h.in config.sub configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
+	rm -rf varnish-* Makefile.in aclocal.m4 config.guess config.h.in config.sub configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
 	dh_clean
 
 
