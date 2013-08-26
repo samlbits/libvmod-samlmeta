@@ -14,5 +14,10 @@ override_dh_gencontrol:
 		dh_gencontrol ; \
 	fi
 
+clean:
+	rm -rf Makefile.in aclocal.m4 config.guess config.h.in config.sub configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
+	dh_clean
+
+
 %:
 	dh $@
