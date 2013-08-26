@@ -1,4 +1,4 @@
-Source: libvmmod-samlmeta
+Source: libvmod-samlmeta
 Priority: extra
 Maintainer: Leif Johansson <leifj@mnt.se>
 Build-Depends: debhelper (>= 8.0.0), autotools-dev
