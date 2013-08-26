@@ -8,7 +8,7 @@ VMODDIR = $(shell PKG_CONFIG_PATH="$(VARNISHSRC)" pkg-config --variable=vmoddir 
 override_dh_auto_configure:
 	./autogen.sh
 	apt-get source varnish
-	(cd ${VARNISHSRC} && ./configure --prefix=${prefix} && make)
+	(cd ${VARNISHSRC} && ./configure --exec_prefix="`pkg-config --variable=exec_prefix varnishapi`" --prefix="`pkg-config  --variable=prefix varnishapi`" --libdir="`pkg-config  --variable=libdir varnishapi`" --includedir="`pkg-config  --variable=includedir varnishapi`" --vmoddir="`pkg-config  --variable=vmoddir varnishapi`" && make)
 	dh_auto_configure -- VMODDIR="$(VMODDIR)" VARNISHSRC="$(VARNISHSRC)"
 
 override_dh_gencontrol:
