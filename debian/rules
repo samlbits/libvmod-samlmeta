@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 export DH_VERBOSE=1
 
-VERSION = `apt-cache show varnish | grep Version: | awk '{print $2}' | awk -F- '{print $1}'`
+VERSION = `apt-cache show varnish | grep Version: | awk '{print $$2}' | awk -F- '{print $$1}'`
 VARNISHSRC = varnish-${VERSION}
 VMODDIR = $(shell PKG_CONFIG_PATH="$(VARNISHSRC)" pkg-config --variable=vmoddir varnishapi)
 
