@@ -1,7 +1,7 @@
 Source: libvmod-samlmeta
 Priority: extra
 Maintainer: Leif Johansson <leifj@mnt.se>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, varnishapi (>= 3)
 Standards-Version: 3.9.4
 Section: libs
 Homepage: http://github.com/samlbits/libvmod-samlbits
