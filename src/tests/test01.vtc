@@ -2,21 +2,37 @@ varnishtest "Test samlmeta vmod"
 
 server s1 {
   	rxreq
+<<<<<<< HEAD
 	txresp
+=======
+	txresp -body "<?xml version=\"1.0\"?>\n<EntityDescriptors cacheDuration=\"PT1H10M20S\"><bla/>"
+>>>>>>> debian
 } -start
 
 varnish v1 -vcl+backend {
 	import samlmeta from "${vmod_topbuild}/src/.libs/libvmod_samlmeta.so";
 
 	sub vcl_deliver {
+<<<<<<< HEAD
 		set resp.http.hello = samlmeta.samlmeta_ttl()
+=======
+		set resp.http.x-hello = samlmeta.samlmeta_ttl();
+>>>>>>> debian
 	}
 } -start
 
 client c1 {
 	txreq -url "/"
 	rxresp
+<<<<<<< HEAD
 	expect resp.http.hello == ""
 }
 
 client c1 -run
+=======
+	expect resp.http.x-hello == "4220s"
+}
+
+client c1 -run
+client c1 -run
+>>>>>>> debian

@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+export DH_VERBOSE=1
+
+VERSION = `apt-cache show varnish | grep Version: | awk '{print $$2}' | awk -F- '{print $$1}'`
+VARNISHSRC = varnish-${VERSION}
+VMODDIR = $(shell PKG_CONFIG_PATH="$(VARNISHSRC)" pkg-config --variable=vmoddir varnishapi)
+
+exec_prefix=$(shell pkg-config --variable=exec_prefix varnishapi)
+prefix=$(shell pkg-config --variable=prefix varnishapi)
+libdir=$(shell pkg-config --variable=libdir varnishapi)
+includedir=$(shell pkg-config --variable=includedir varnishapi)
+vmoddir=$(shell pkg-config --variable=vmoddir varnishapi)
+
+
+override_dh_auto_configure:
+	./autogen.sh
+	apt-get source varnish
+	(cd ${VARNISHSRC} && ./configure --exec-prefix=${exec_prefix} --localstatedir=/var --sysconfdir=/etc/varnish --prefix=${prefix} --libdir=${libdir} --includedir=${includedir} VMDODDIR=${vmoddir} && make)
+	 dh_auto_configure -- VMODDIR="$(VMODDIR)" VARNISHSRC="$(VARNISHSRC)"
+
+override_dh_gencontrol:
+	if [ -n "$$DEBIAN_OVERRIDE_BINARY_VERSION" ]; then \
+		dh_gencontrol -- -v$$DEBIAN_OVERRIDE_BINARY_VERSION; \
+	else \
+		dh_gencontrol ; \
+	fi
+
+clean:
+	rm -rf config.h libtool varnish-* varnish_* Makefile.in aclocal.m4 config.log config.guess config.h.in config.sub config.status configure depcomp install-sh ltmain.sh m4 missing src/Makefile.in vmod_samlmeta.3
+	dh_clean
+
+
+%:
+	dh $@

@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <regex.h>
 #include <expat.h>
+#include <math.h>
 
 #include "vrt.h"
 #include "vqueue.h"
@@ -120,19 +121,21 @@ typedef struct {
        __typeof__ (b) _b = (b); \
      _a < _b ? _a : _b; })
 
-#define PARSELEN 128 
+#define PARSELEN 256
 
 static void
 begin_element(void *data, const char *element, const char **attr)
 {
    validity_data_t *validity = (validity_data_t *)data;
    validity->tries++;
-   if (strcasecmp(element,"EntitiesDescriptor") == 0) {
+   fprintf(stderr,"begin_element %s\n",element);
+   if (strcasecmp(element,"EntityDescriptors") == 0) {
       for (int i = 0; attr[i]; i += 2) {
          if (strcasecmp(attr[i],"cacheDuration") == 0) {
-            validity->cacheDuration = strdup(attr[i+1]);
+            validity->cacheDuration = attr[i+1];
+	    fprintf(stderr,"cd %s\n",attr[i+1]);
          } else if (strcasecmp(attr[i],"validUntil") == 0) {
-            validity->validUntil = strdup(attr[i+1]);
+            validity->validUntil = attr[i+1];
          }
       }
    }
@@ -141,6 +144,7 @@ begin_element(void *data, const char *element, const char **attr)
 static void 
 end_element(void *data, const char *element)
 {
+   fprintf(stderr,"end_element %s\n",element);
 }
 
 const char * __match_proto__()
@@ -149,6 +153,7 @@ vmod_samlmeta_ttl(struct sess *sp) {
     validity_data_t validity;
     char *ttl = NULL,*s = NULL;
     unsigned u = 0,v = 0;
+    int ret = 0,tot = 0;
 
     if (sp->step != STP_PREPRESP) {
         /* Can be called only from vcl_deliver */
@@ -157,42 +162,69 @@ vmod_samlmeta_ttl(struct sess *sp) {
     }
 
     buf = _object_read(sp);
+    fprintf(stderr,"buf: '%s'\n",buf.ptr);
 
     memset(&validity,0,sizeof(validity));
 
-    XML_Parser parser = XML_ParserCreate(NULL);
+    XML_Parser parser = XML_ParserCreate("UTF-8");
     XML_SetElementHandler(parser,begin_element,end_element);
     XML_SetUserData(parser,&validity);
-    XML_Parse(parser,buf.ptr,min(PARSELEN,buf.len),0);
-    XML_ParserFree(parser);
+    ret = XML_Parse(parser,buf.ptr,min(PARSELEN,buf.len),0);
+    if (ret == 0) {
+       fprintf(stderr,"XML parsing error (%d): %s\n",ret,XML_ErrorString(XML_GetErrorCode(parser)));
+       goto out;
+    }
 
+    fprintf(stderr,"cacheDuration=%s\n",validity.cacheDuration);
     if (validity.cacheDuration != NULL) {
-        ttl = validity.cacheDuration;
+        int v = 0;
+        char *p = validity.cacheDuration;
+        char m;
+        int time = 0;
+        // PThHmMsS
+        fprintf(stderr,"starting duration parse: %s\n",p);
+        if (p[0] == 'P' && p[1] == 'T') {
+           p += 2;
+           fprintf(stderr,"@ %s\n",p);
+           while (*p) {
+              int ns = sscanf(p,"%d%c",&v,&m);
+              fprintf(stderr,"ns: %d\n",ns);
+              if (2 != ns) goto out;
+
+              switch (m) {
+                 case 'H':
+                 case 'h':
+                    tot += 3600*v;
+                    break;
+                 case 'M':
+                 case 'm':
+                    tot += 60*v;
+                    break;
+                 case 'S':
+                 case 's':
+                    tot += v;
+                    break;
+                 default:
+		    fprintf(stderr,"ignoring format at ... %s\n",p);
+                    break;
+              }
+              while (*p && *p >= 48 && *p <= 57) p++; // skip numbers
+              p++;
+           }
+        }
     } else if (validity.validUntil != NULL) {
-        ttl = "1h";
+        tot = 1;
     }
 
-    if (ttl != NULL) {
-       u = WS_Reserve(sp->wrk->ws, 0);
-       s = sp->wrk->ws->f;
-       v = snprintf(s,u,"%s",validity.cacheDuration);
-       v++;
- 
-       if (validity.cacheDuration != NULL)
-          free(validity.cacheDuration);
+    fprintf(stderr,"tot: %d\n", tot);
 
-       if (validity.validUntil != NULL)
-          free(validity.validUntil);
-
-       if (v > u) {
-          WS_Release(sp->wrk->ws,0);
-          return (NULL);
-       }
-
-       WS_Release(sp->wrk->ws, v);
-       return (s);
-    } else {
-       return (NULL);
+    if (tot > 0) {
+       int len = (tot == 0 ? 1 : (int)(log10(tot)+1));
+       ttl = WS_Alloc(sp->wrk->ws,len+2);
+       sprintf(ttl,"%ds",tot);
     }
 
+out:
+    XML_ParserFree(parser);
+    return ttl;
 }
