@@ -3,11 +3,7 @@ INCLUDES = -I$(VARNISHSRC)/include -I$(VARNISHSRC)
 vmoddir = $(VMODDIR)
 vmod_LTLIBRARIES = libvmod_samlmeta.la
 
-<<<<<<< HEAD
-libvmod_samlmeta_la_LDFLAGS = -module -export-dynamic -avoid-version
-=======
 libvmod_samlmeta_la_LDFLAGS = -module -export-dynamic -avoid-version -lexpat
->>>>>>> debian
 
 libvmod_samlmeta_la_SOURCES = \
 	vcc_if.c \
