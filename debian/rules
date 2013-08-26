@@ -67,11 +67,12 @@ clean:
 
 
 	dh_clean
+	rm -rf varnish_* varnish-*
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
 
 # Build architecture-independent files here.
@@ -82,7 +83,7 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs CHANGELOG
+#	dh_installchangelogs CHANGELOG
 #	dh_installdocs
 #	dh_installexamples
 #	dh_install
