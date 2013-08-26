@@ -7,3 +7,9 @@ Section: libs
 Homepage: http://github.com/samlbits/libvmod-samlbits
 #Vcs-Git: git://git.debian.org/collab-maint/libvmmod-samlmeta.git
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/libvmmod-samlmeta.git;a=summary
+
+Package: libvmod-samlmeta
+Architecture: any
+Depends: varnish (>= 3)
+Description: Varnish Module (vmod) for manipulation of duplicated headers (for instance
+ multiple set-cookie headers).
